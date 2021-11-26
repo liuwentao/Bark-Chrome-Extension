@@ -102,7 +102,7 @@ function sendMsg(content, full_server_url = "", msgType = "normal") {
 			if (full_server_url.startsWith("selection#")) {
 				full_server_url = full_server_url.replace(/selection#/g, "")
 			}
-
+			var msg_group=items.server_urls[0].msg_group;
 			console.log(full_server_url);
 
 			var notify_callback = function () {
@@ -114,7 +114,7 @@ function sendMsg(content, full_server_url = "", msgType = "normal") {
 
 			if (full_server_url.startsWith("http") || full_server_url.startsWith("https")) {
 				// iPhone push
-				httpGetAsync(full_server_url + encodeURIComponent(content) + "?automaticallyCopy=" + auto_copy_flag, notify_callback);
+				httpGetAsync(full_server_url + encodeURIComponent(content) + "?autoCopy=" + auto_copy_flag +"&group="+msg_group, notify_callback);
 			} else {
 				// Android push
 				pushAndroidMsg(full_server_url, content, notify_callback, msgType);

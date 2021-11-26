@@ -96,7 +96,10 @@ Object.defineProperty(data, 'serverURLs', {
       dataServerURLs = value;
       var str = '<ul>';
       value.forEach(function(it) {
-        str += '<li class="url"><u>' + it.server_name +'</u> <button>delete</button> <div style="width:500px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"><strong>'+ it.server_url + '</strong></div></li>';
+        str += '<li class="url"><u>' + it.server_name +'</u> <button>delete</button>';
+        str +='<div style="width:500px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"><strong>'+ it.server_url + '</strong></div>';
+        str +='<div style="width:100px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">Group:<strong>'+ it.msg_group + '</strong></div>';
+        str+=  '</li>';
       }); 
 
       str += '</ul>';
@@ -175,19 +178,19 @@ function delete_server(e) {
 function addServer() {
   var server_name = document.getElementById('server_name').value;
   var server_url = document.getElementById('server_url').value;
+  var msg_group = document.getElementById('msg_group').value;
 
   if (document.getElementsByName("device")[1].checked == true) {
     console.log('Valid Android Token');
-    data.serverURLs.push({"server_name": server_name, "server_url": server_url});
-    data.serverURLs = data.serverURLs
+    data.serverURLs.push({"server_name": server_name, "server_url": server_url,"msg_group":msg_group});
+    data.serverURLs = data.serverURLs;
     return
   }
 
   if (ValidURL(server_url)) { //check url if valid 
-
     console.log('Valid Server');
-    data.serverURLs.push({"server_name": server_name, "server_url": server_url});
-    data.serverURLs = data.serverURLs
+    data.serverURLs.push({"server_name": server_name, "server_url": server_url,"msg_group":msg_group});
+    data.serverURLs = data.serverURLs;
   }
 }
 
