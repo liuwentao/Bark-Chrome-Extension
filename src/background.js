@@ -61,7 +61,8 @@ function sendUrl(tab) {
 		'lastFocusedWindow': true
 	}, function (tabs) {
 		var currentUrl = tabs[0].url;
-		sendMsg(currentUrl);
+		var title= tabs[0].title;
+		sendMsgWithUrl(title,"",currentUrl);
 		console.log(currentUrl);
 	});
 }
@@ -84,6 +85,57 @@ function getClipboardData() {
 	return result;
 }
 
+function encodeQuery(data){
+    let query = "?";
+    for (let d in data)
+         query += encodeURIComponent(d) + '=' 
+                  + encodeURIComponent(data[d]) + '&';
+    return query.slice(0, -1);
+}
+function sendMsgWithUrl(title,content,url) {
+	chrome.storage.sync.get({
+		server_urls: []
+	}, function (items) {
+		if (items.server_urls === '' | items.server_urls.length === 0) {
+			alert("please set server_url in options!");
+			chrome.tabs.create({
+				url: "options.html"
+			});
+		} else {
+			var bark_server = items.server_urls[0].server_url;
+			var msg_group=items.server_urls[0].msg_group;
+			if (bark_server.startsWith("selection#")) {
+				bark_server = bark_server.replace(/selection#/g, "")
+			}
+			console.log(bark_server);
+			var notify_callback = function () {
+					var notification = new Notification("Message Sent", {
+						body: content,
+						icon: "bark_128.png"
+					});
+				};
+			var dictParam = {};
+			dictParam["autoCopy"]=auto_copy_flag;
+			dictParam["group"]=msg_group;
+			if(url!==""){
+				dictParam["url"]=url;
+				dictParam["autoCopy"]="";
+			}
+			var sendUrl =bark_server
+			if(title !==null){
+				sendUrl+= encodeURIComponent(title)+"/";
+			}
+			if(content !==null){
+				sendUrl+= encodeURIComponent(content)+"/";
+			}
+			console.log(sendUrl);
+			var encodeParam = encodeQuery(dictParam);
+			 sendUrl = sendUrl.slice(0, -1)+ encodeParam;
+		
+			httpGetAsync(sendUrl, notify_callback);
+		}
+	});
+}
 
 function sendMsg(content, full_server_url = "", msgType = "normal") {
 	chrome.storage.sync.get({
@@ -119,8 +171,6 @@ function sendMsg(content, full_server_url = "", msgType = "normal") {
 				// Android push
 				pushAndroidMsg(full_server_url, content, notify_callback, msgType);
 			}
-
-			
 		};
 	});
 }
